@@ -12,7 +12,9 @@ import java.awt.event.*;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ScanFrame {
 
@@ -25,12 +27,17 @@ public class ScanFrame {
     private JLabel addedLabel = new JLabel("Added Card", SwingConstants.CENTER);
 
     private JPanel rightSidePanel = new JPanel();
+    private JPanel deckPanel;
+
+    private JScrollPane deckPane;
 
     private JLayeredPane layeredPane = new JLayeredPane();
 
     private JTextArea messageScrollText = new JTextArea();
 
     private JFrame frame = new JFrame();
+
+    private Map<Integer, String> deckNames = new HashMap<>();
 
     private final int RIGHT_PANEL_WIDTH = 250;
     private final int THUMBNAIL_WIDTH = 244;
@@ -98,55 +105,7 @@ public class ScanFrame {
 //        scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
 
 
-        List<String> decks = new ArrayList<>();
-        decks.add("• A");
-        decks.add("• C");
-        decks.add("• B");
-        decks.add("• Some other deck here");
-        decks.add("• Another deck here");
 
-        decks = decks.stream().sorted().toList();
-        DefaultListModel<String> listModel = new DefaultListModel<>();
-
-        for(String deck: decks){
-            listModel.addElement(deck);
-        }
-
-        JList<String> list = new JList<>(listModel);
-        list.setBackground(Color.DARK_GRAY);
-        list.setForeground(Color.WHITE);
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        // 3. Add double-click functionality
-        list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int index = list.locationToIndex(e.getPoint());
-                    if (index != -1) {
-                        String selectedItem = listModel.getElementAt(index);
-                        selectedItem = selectedItem.substring(1).trim();
-                        JLabel label = new JLabel(selectedItem);
-                        int result = JOptionPane.showConfirmDialog(frame, label, "Change to this deck?", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-//                            JOptionPane.showMessageDialog(frame, label);
-
-                        if (result == JOptionPane.OK_OPTION) {
-                            System.out.println(selectedItem);
-                        }
-                    }
-                }
-            }
-        });
-        JScrollPane deckPane = new JScrollPane(list);
-        deckPane.setPreferredSize(new Dimension(THUMBNAIL_WIDTH, 200));
-        deckPane.setBackground(Color.DARK_GRAY);
-        JLabel deckLabel = new JLabel("Your Decks: ");
-        deckLabel.setForeground(Color.WHITE);
-        deckLabel.setBackground(Color.DARK_GRAY);
-        JPanel deckPanel = new JPanel();
-        deckPanel.add(deckLabel);
-        deckPanel.add(deckPane);
-        deckPanel.setBackground(Color.DARK_GRAY);
 
 //        deckPane.setForeground(Color.WHITE);
 
@@ -295,5 +254,80 @@ public class ScanFrame {
 
     public void addThumbnailErrorMessage(){
         messageScrollText.append("Error in pulling thumbnail icon\n\n");
+    }
+
+    private void createDeckScrollPanel(){
+
+
+        List<String> decks = new ArrayList<>();
+        List<String> finalDecks = decks;
+
+        deckNames.forEach((Integer i, String name) ->
+            finalDecks.add(name));
+
+        if(deckNames.isEmpty()) {
+            setupFirstDeck();
+        }
+
+        for(String name: finalDecks){
+            decks.add("• " + name);
+        }
+
+
+
+        decks.add("• A");
+        decks.add("• C");
+        decks.add("• B");
+        decks.add("• Some other deck here");
+        decks.add("• Another deck here");
+
+        decks = decks.stream().sorted().toList();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+
+        for(String deck: decks){
+            listModel.addElement(deck);
+        }
+
+        JList<String> list = new JList<>(listModel);
+        list.setBackground(Color.DARK_GRAY);
+        list.setForeground(Color.WHITE);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // 3. Add double-click functionality
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int index = list.locationToIndex(e.getPoint());
+                    if (index != -1) {
+                        String selectedItem = listModel.getElementAt(index);
+                        selectedItem = selectedItem.substring(1).trim();
+                        JLabel label = new JLabel(selectedItem);
+                        int result = JOptionPane.showConfirmDialog(frame, label, "Change to this deck?", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+//                            JOptionPane.showMessageDialog(frame, label);
+
+                        if (result == JOptionPane.OK_OPTION) {
+                            System.out.println(selectedItem);
+                        }
+                    }
+                }
+            }
+        });
+        deckPane = new JScrollPane(list);
+        deckPane.setPreferredSize(new Dimension(THUMBNAIL_WIDTH, 200));
+        deckPane.setBackground(Color.DARK_GRAY);
+        JLabel deckLabel = new JLabel("Your Decks: ");
+        deckLabel.setForeground(Color.WHITE);
+        deckLabel.setBackground(Color.DARK_GRAY);
+        deckPanel = new JPanel();
+        deckPanel.add(deckLabel);
+        deckPanel.add(deckPane);
+        deckPanel.setBackground(Color.DARK_GRAY);
+    }
+    private void getDeckNames(){
+
+    }
+    public void setupFirstDeck(){
+
     }
 }

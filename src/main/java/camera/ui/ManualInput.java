@@ -1,9 +1,16 @@
 package camera.ui;
 
+import database.SQLStatements;
+
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ManualInput {
+public class ManualInput implements SQLStatements {
 //    public static void main(String[] args) {
 //        // 1. Initialize the input text fields
 //        JTextField setCode = new JTextField(10);
@@ -103,5 +110,26 @@ public class ManualInput {
         JPanel alertUser = new JPanel();
         alertUser.add(new JLabel("Click and drag a box closely around where you plan on placing the cards to be scanned"));
         JOptionPane.showConfirmDialog(null, alertUser, "First Step", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    public static Map<Integer, String> getDecks(Connection conn){
+
+        Map<Integer, String> decks = new HashMap<Integer, String>();
+
+        try(PreparedStatement getDeckName = conn.prepareStatement(GetDeckNameSQL)) {
+            var resultSet = getDeckName.executeQuery();
+
+            while(resultSet.next()){
+                decks.put(resultSet.getInt(1), resultSet.getString(2));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        if(!decks.isEmpty()){
+            return decks;
+        }
+        return null;
     }
 }

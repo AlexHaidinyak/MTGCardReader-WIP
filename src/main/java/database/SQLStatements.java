@@ -5,6 +5,14 @@ package database;
  * */
 public interface SQLStatements {
 
+    String GetDeckNameSQL = """
+            SELECT *
+            FROM Decks""";
+
+    String DeckNameSQL = """
+            INSERT INTO Decks
+            VALUES(1,?)""";
+
     /**
      * SQL statement for inserting into Color_Identity
      * */
@@ -30,7 +38,7 @@ public interface SQLStatements {
             INSERT INTO
                 Card_Table
             VALUES
-                (?,?,?,?,1,?);""";
+                (?,?,?,?,1,?,?);""";
 
     /**
      * SQL statement for updating the count column of Card_Table
