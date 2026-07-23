@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.URI;
 import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -143,6 +144,7 @@ public class ScanFrame {
         thumbNailLabel.setMaximumSize(new Dimension(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT));
         thumbNailLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        createDeckScrollPanel();
 
         rightSidePanel.setLayout(new BoxLayout(rightSidePanel, BoxLayout.Y_AXIS));
         rightSidePanel.setPreferredSize(new Dimension(RIGHT_PANEL_WIDTH, initialWebcamHeight));
@@ -241,6 +243,30 @@ public class ScanFrame {
         return webcamPanel.getHeight();
     }
 
+    public String getFirstDeck(Connection conn){
+        JTextField deckName = new JTextField(100);
+        JTextField description = new JTextField();
+        description.setText("No decks found, please enter the name of the first deck:");
+        description.setEditable(false);
+
+        JPanel deckInput = new JPanel(new GridLayout(2,1));
+        deckInput.add(description);
+        deckInput.add(deckName);
+
+        while(true) {
+            int result = JOptionPane.showConfirmDialog(null,
+                    deckInput,
+                    "",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE);
+
+            if (result == JOptionPane.OK_OPTION) {
+                String name = deckName.getText();
+                return name;
+            }
+        }
+    }
+
     public void addAddedMessage(String cardName) {
         messageScrollText.append("Added: " + cardName + "\n\n");
     }
@@ -265,9 +291,9 @@ public class ScanFrame {
         deckNames.forEach((Integer i, String name) ->
             finalDecks.add(name));
 
-        if(deckNames.isEmpty()) {
-            setupFirstDeck();
-        }
+//        if(deckNames.isEmpty()) {
+//            setupFirstDeck();
+//        }
 
         for(String name: finalDecks){
             decks.add("• " + name);

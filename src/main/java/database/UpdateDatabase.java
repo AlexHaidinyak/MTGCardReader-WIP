@@ -3,6 +3,7 @@ package database;
 import card.enums.CARD_TYPE;
 import card.enums.COLOR_IDENTITY;
 
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -140,23 +141,11 @@ public class UpdateDatabase implements SQLStatements{
         cardBatch.add(urlAdd);
     }
 
-    public static boolean addNewDeck(Connection conn, String deckName) throws SQLException {
-        try(var addDeck = conn.prepareStatement(DeckNameSQL)){
-            addDeck.setString(1, deckName);
-            var result = addDeck.executeUpdate();
-
-            if(result == 1){
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-    }
-
     public static Map<Integer, String> getDecks(Connection conn){
 
         Map<Integer, String> decks = new HashMap<Integer, String>();
+
+        JTextField deckNameField = new JTextField(50);
 
         try(PreparedStatement getDeckName = conn.prepareStatement(GetDeckNameSQL)) {
             var resultSet = getDeckName.executeQuery();
@@ -170,6 +159,22 @@ public class UpdateDatabase implements SQLStatements{
         }
 
         return decks;
+    }
+
+    public static boolean addNewDeck(Connection conn, String deckName) throws SQLException {
+
+        try(var addDeck = conn.prepareStatement(DeckNameSQL)){
+
+            addDeck.setString(1, deckName);
+            var result = addDeck.executeUpdate();
+
+            if(result == 1){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
     }
 
 }
