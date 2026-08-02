@@ -2,6 +2,7 @@ package database;
 
 import card.enums.CARD_TYPE;
 import card.enums.COLOR_IDENTITY;
+import org.h2.command.Prepared;
 
 import javax.swing.*;
 import java.sql.Connection;
@@ -11,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UpdateDatabase implements SQLStatements{
+public class UpdateDatabase implements QuerySQLStatements, CreateTablesSQLStatements {
 
     private UpdateDatabase(){}
 
@@ -174,6 +175,67 @@ public class UpdateDatabase implements SQLStatements{
             else{
                 return false;
             }
+        }
+    }
+
+    public static void createTables(Connection conn) throws SQLException {
+        createFirstBatch(conn);
+        createSecondBatch(conn);
+        populateStaticTables(conn);
+    }
+
+    private static void createFirstBatch(Connection conn) throws SQLException {
+
+        try(PreparedStatement cardTable  = conn.prepareStatement(CreateCARD_TABLESQL);
+            PreparedStatement cardType   = conn.prepareStatement(CreateCARD_TYPE_TABLESQL);
+            PreparedStatement colorTable = conn.prepareStatement(CreateCOLOR_TABLESQL);
+            PreparedStatement decks      = conn.prepareStatement(CreateDECKSSQL)) {
+
+            cardTable.executeUpdate();
+            cardType.executeUpdate();
+            colorTable.executeUpdate();
+            decks.executeUpdate();
+        }
+    }
+    private static void createSecondBatch(Connection conn) throws SQLException {
+
+        try(PreparedStatement cardTypeMiddle  = conn.prepareStatement(CreateCARD_IDENTITYSQL);
+            PreparedStatement cardSubType     = conn.prepareStatement(CreateCARD_SUB_TYPESQL);
+            PreparedStatement checkId         = conn.prepareStatement(CreateCHECK_SET_IDSQL);
+            PreparedStatement cardColorMiddle = conn.prepareStatement(CreateCOLOR_IDENTITYSQL);
+            PreparedStatement creatureStats   = conn.prepareStatement(CreateCREATURE_STATSSQL);
+            PreparedStatement deckMiddle      = conn.prepareStatement(CreateDECKS_IDENTITYSQL);
+            PreparedStatement gameChanger     = conn.prepareStatement(CreateGAME_CHANGERSQL);
+            PreparedStatement imageURLS       = conn.prepareStatement(CreateIMAGE_URLSQL);
+            PreparedStatement legendaryCard   = conn.prepareStatement(CreateLEGENDARY_CREATURESQL)) {
+
+            cardTypeMiddle.executeUpdate();
+            cardSubType.executeUpdate();
+            checkId.executeUpdate();
+            cardColorMiddle.executeUpdate();
+            creatureStats.executeUpdate();
+            deckMiddle.executeUpdate();
+            gameChanger.executeUpdate();
+            imageURLS.executeUpdate();
+            legendaryCard.executeUpdate();
+        }
+    }
+    private static void populateStaticTables(Connection conn) throws SQLException {
+
+        try(PreparedStatement staticColorAdd = conn.prepareStatement(PopulateCOLOR_TABLESQL);
+            PreparedStatement staticTypeAdd = conn.prepareStatement(PopulateCARD_TYPE_TABLESQL)){
+
+            for(COLOR_IDENTITY color: COLOR_IDENTITY.values()){
+                staticColorAdd.setString(1, color.name());
+                staticColorAdd.addBatch();
+            }
+            staticTypeAdd.executeUpdate();
+
+            for(CARD_TYPE cardType: CARD_TYPE.values()){
+                staticTypeAdd.setString(1, cardType.name());
+                staticTypeAdd.addBatch();
+            }
+            staticTypeAdd.executeUpdate();
         }
     }
 
